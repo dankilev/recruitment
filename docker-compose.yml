@@ -1,0 +1,35 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+    volumes:
+      - ./:/var/www/test
+    working_dir: /var/www/test
+
+  nginx:
+    image: nginx:1.13
+    ports:
+      - 8080:80
+    depends_on:
+      - app
+    volumes:
+      - ./:/var/www/test
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+
+  database:
+    image: mysql:5.7
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "33061:3306"
+    environment:
+      - "MYSQL_DATABASE=test"
+      - "MYSQL_USER=testuser"
+      - "MYSQL_PASSWORD=password"
+      - "MYSQL_ROOT_PASSWORD=verysecret"
+
+volumes:
+  dbdata: ~
